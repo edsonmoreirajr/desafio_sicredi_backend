@@ -1,0 +1,69 @@
+package com.edsonmoreirajr.votacao.usecase.impl;
+
+import com.edsonmoreirajr.votacao.dto.AssociadoDto;
+import com.edsonmoreirajr.votacao.dto.request.AssociadoRequest;
+import com.edsonmoreirajr.votacao.exception.BusinessException;
+import com.edsonmoreirajr.votacao.gateway.AssociadoGateway;
+import com.edsonmoreirajr.votacao.mapper.AssociadoMapper;
+import com.edsonmoreirajr.votacao.usecase.AssociadoUseCase;
+import com.edsonmoreirajr.votacao.validator.PageableValidator;
+import jakarta.persistence.EntityNotFoundException;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+
+import java.util.stream.Collectors;
+
+import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
+
+@Slf4j
+@Service
+@RequiredArgsConstructor
+public class AssociadoUseCaseImpl implements AssociadoUseCase {
+
+    private final AssociadoGateway associadoGateway;
+
+    @Override
+    public Page<AssociadoDto> getAllAssociados(Pageable pageable) {
+        PageableValidator.validaPaginaENomeColunasOrdenacaoDoPageable(pageable);
+
+        var associados = associadoGateway.getAllAssociados(pageable);
+        return new PageImpl<>(associados.stream()
+                .map(AssociadoMapper.INSTANCE::toAssociadoDto)
+                .collect(Collectors.toList()), associados.getPageable(), associados.getTotalElements());
+    }
+
+    @Override
+    public AssociadoDto createAssociado(AssociadoRequest associadoRequest) {
+        var associado = associadoGateway.getAssociadoByCPF(associadoRequest.getCpf()).orElse(null);
+        if (nonNull(associado)) {
+            throw new BusinessException("Usuário já cadastrado com CPF: " + associadoRequest.getCpf());
+        }
+        associado = AssociadoMapper.INSTANCE.toAssociado(associadoRequest);
+        return AssociadoMapper.INSTANCE.toAssociadoDto(associadoGateway.createOrUpdateAssociado(associado));
+    }
+
+    @Override
+    public AssociadoDto updateAssociado(Long id, AssociadoRequest associadoRequest) {
+        var associado = associadoGateway.getAssociadoById(id).orElse(null);
+        if (isNull(associado)) {
+            throw new EntityNotFoundException("Associado não encontrado para o Id: " + id);
+        }
+        AssociadoMapper.INSTANCE.updateAssociadoFromAssociadoRequest(associadoRequest, associado);
+        return AssociadoMapper.INSTANCE.toAssociadoDto(associadoGateway.createOrUpdateAssociado(associado));
+    }
+
+    @Override
+    public AssociadoDto getAssociadoById(Long id) {
+        var associado = associadoGateway.getAssociadoById(id).orElse(null);
+        return AssociadoMapper.INSTANCE.toAssociadoDto(associado);
+    }
+
+    public void deleteAssociado(Long id) {
+        associadoGateway.deleteAssociado(id);
+    }
+}

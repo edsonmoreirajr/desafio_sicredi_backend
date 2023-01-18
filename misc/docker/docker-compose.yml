@@ -1,0 +1,62 @@
+version: '3.8'
+
+services:
+
+  postgres_db:
+    container_name: postgres
+    image: postgres:15.1-alpine3.17
+    environment:
+      POSTGRES_DB: sicredivotacao
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - postgresql_bin:/usr/lib/postgresql
+      - postgresql_data:/var/lib/postgresql/data
+      - ./sicredivotacao_postgresql/sicredivotacao.sql:/docker-entrypoint-initdb.d/sicredivotacao.sql
+      - ./files_postgres:/files
+    ports:
+      - 55432:5432
+    networks:
+      - database
+      - application
+    restart: always
+
+  pgadmin:
+    container_name: pgadmin
+    image: dpage/pgadmin4:2023-01-09-2
+    environment:
+      PGADMIN_DEFAULT_EMAIL: pgadmin4@pgadmin.org
+      PGADMIN_DEFAULT_PASSWORD: postgres
+      PGADMIN_LISTEN_PORT: 5050
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+    volumes:
+      - postgresql_bin:/usr/lib/postgresql
+      - pgadmin_root_prefs:/root/.pgadmin
+      - ./files_pgamdin:/files
+    ports:
+      - 5050:5050
+    networks:
+      - database
+    restart: always
+
+  sicredi-votacao:
+    build: ./../../
+    image: sicredi-votacao:1.0
+    ports:
+      - 8080:8080
+    networks:
+      - application
+
+networks:
+  database:
+    driver: bridge
+  application:
+    driver: bridge
+volumes:
+  pgadmin_root_prefs:
+    driver: local
+  postgresql_data:
+    driver: local
+  postgresql_bin:
+    driver: local
+
