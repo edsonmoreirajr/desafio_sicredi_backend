@@ -52,3 +52,4 @@ Ter instalado o Docker e Docker Compose. Executar os seguintes comandos via term
 Utilizar o Postman para testar os endpoints da aplicação. Importar para ele a collection da pasta misc\postman que está na raiz do projeto
 
 ## Considerações sobre a implementação
+Não foi possível implementar o código para integração do serviço https://user-info.herokuapp.com/users/{cpf} por ele não estar mais funcionando. Então resolvi implementar endpoints para genrenciar os Associados pela aplicação. 
