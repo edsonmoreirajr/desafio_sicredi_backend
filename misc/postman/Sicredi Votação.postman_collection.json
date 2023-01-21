@@ -45,7 +45,7 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "localhost:8080/api/v1/associados/12",
+              "raw": "localhost:8080/api/v1/associados/11",
               "host": [
                 "localhost"
               ],
@@ -54,7 +54,7 @@
                 "api",
                 "v1",
                 "associados",
-                "12"
+                "11"
               ]
             }
           },
@@ -66,7 +66,7 @@
             "method": "DELETE",
             "header": [],
             "url": {
-              "raw": "localhost:8080/api/v1/associados/12",
+              "raw": "localhost:8080/api/v1/associados/11",
               "host": [
                 "localhost"
               ],
@@ -75,7 +75,7 @@
                 "api",
                 "v1",
                 "associados",
-                "12"
+                "11"
               ]
             }
           },
@@ -406,7 +406,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n    \"pautaId\": 1\r\n}",
+              "raw": "{\r\n    \"pautaId\": 2,\r\n    \"duracao\": 5\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -471,7 +471,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n    \"associadoId\": 1,\r\n    \"sessaoId\": 1,\r\n    \"voto\": \"SIM\"\r\n}",
+              "raw": "{\r\n    \"associadoId\": 3,\r\n    \"sessaoId\": 1,\r\n    \"voto\": \"SIM\"\r\n}",
               "options": {
                 "raw": {
                   "language": "json"

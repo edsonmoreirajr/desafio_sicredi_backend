@@ -1,9 +1,10 @@
 package com.edsonmoreirajr.votacao.usecase.impl;
 
+import com.edsonmoreirajr.votacao.config.message.MessageSourceService;
 import com.edsonmoreirajr.votacao.dto.VotoDto;
 import com.edsonmoreirajr.votacao.dto.request.VotoRequest;
 import com.edsonmoreirajr.votacao.entity.Sessao;
-import com.edsonmoreirajr.votacao.entity.enums.StatusAssociadoEnum;
+import com.edsonmoreirajr.votacao.entity.enums.EnumStatusAssociado;
 import com.edsonmoreirajr.votacao.exception.BusinessException;
 import com.edsonmoreirajr.votacao.gateway.AssociadoGateway;
 import com.edsonmoreirajr.votacao.gateway.SessaoGateway;
@@ -24,6 +25,11 @@ import static java.util.Objects.nonNull;
 @RequiredArgsConstructor
 public class VotoUseCaseImpl implements VotoUseCase {
 
+    private final static String BUSINESS_ASSOCIADO_VOTO_UNICO = "business.associado.voto-unico";
+    private final static String ENTITY_NOT_FOUND_ASSOCIADO = "entity-not-found.associado";
+    private final static String BUSINESS_ASSOCIADO_UNABLE_TO_VOTE = "business.associado.unable-to-vote";
+
+    private final MessageSourceService messageSourceService;
     private final VotoGateway votoGateway;
     private final AssociadoGateway associadoGateway;
     private final SessaoGateway sessaoGateway;
@@ -31,6 +37,7 @@ public class VotoUseCaseImpl implements VotoUseCase {
 
     @Override
     public VotoDto createVoto(VotoRequest votoRequest) {
+
         Sessao sessao = sessaoGateway.getSessaoById(votoRequest.getSessaoId()).orElse(null);
         sessaoUseCase.validaSessaoEstaAtiva(sessao, votoRequest.getSessaoId());
         sessaoUseCase.verificaSeHaTempoRestanteParaVotar(sessao);
@@ -40,7 +47,7 @@ public class VotoUseCaseImpl implements VotoUseCase {
         var voto = votoGateway.getVotoByAssociadoId(votoRequest.getAssociadoId(), votoRequest.getAssociadoId()).orElse(null);
 
         if (nonNull(voto)) {
-            throw new BusinessException("O associado de id: " + votoRequest.getAssociadoId() + " já votou. Só é permitido votar uma vez para a mesma pauta.");
+            throw new BusinessException(messageSourceService.getMessage(BUSINESS_ASSOCIADO_VOTO_UNICO, votoRequest.getAssociadoId()));
         }
 
         voto = VotoMapper.INSTANCE.toVoto(votoRequest);
@@ -50,12 +57,12 @@ public class VotoUseCaseImpl implements VotoUseCase {
     }
 
     private void validaStatusParaVotarDoAssociado(Long associadoId) {
-        StatusAssociadoEnum statusAssociado = associadoGateway.getStatusByAssociadoId(associadoId);
+        EnumStatusAssociado statusAssociado = associadoGateway.getStatusByAssociadoId(associadoId);
         if (isNull(statusAssociado)) {
-            throw new EntityNotFoundException("Associado não encontrado para o id: " + associadoId);
+            throw new EntityNotFoundException(messageSourceService.getMessage(ENTITY_NOT_FOUND_ASSOCIADO, associadoId));
         }
-        if (statusAssociado.equals(StatusAssociadoEnum.UNABLE_TO_VOTE)) {
-            throw new BusinessException("O associado de id: " + associadoId + " não está apto a votar.");
+        if (statusAssociado.equals(EnumStatusAssociado.UNABLE_TO_VOTE)) {
+            throw new BusinessException(messageSourceService.getMessage(BUSINESS_ASSOCIADO_UNABLE_TO_VOTE, associadoId));
         }
     }
 

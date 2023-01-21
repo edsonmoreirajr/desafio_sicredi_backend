@@ -1,9 +1,10 @@
 package com.edsonmoreirajr.votacao.usecase.impl;
 
+import com.edsonmoreirajr.votacao.config.message.MessageSourceService;
 import com.edsonmoreirajr.votacao.dto.PautaDto;
 import com.edsonmoreirajr.votacao.dto.TotalVotosDto;
 import com.edsonmoreirajr.votacao.dto.request.PautaRequest;
-import com.edsonmoreirajr.votacao.entity.enums.StatusPautaEnum;
+import com.edsonmoreirajr.votacao.entity.enums.EnumStatusPauta;
 import com.edsonmoreirajr.votacao.exception.BusinessException;
 import com.edsonmoreirajr.votacao.gateway.PautaGateway;
 import com.edsonmoreirajr.votacao.gateway.SessaoGateway;
@@ -28,6 +29,9 @@ import static java.util.Objects.nonNull;
 @RequiredArgsConstructor
 public class PautaUseCaseImpl implements PautaUseCase {
 
+    private final static String BUSINESS_PAUTA_VINCULADA_SESSAO_ABERTA = "business.pauta.vinculada-sessao-aberta";
+    private final static String ENTITY_NOT_FOUND_PAUTA = "entity-not-found.pauta";
+    private final MessageSourceService messageSourceService;
     private final PautaGateway pautaGateway;
     private final SessaoGateway sessaoGateway;
 
@@ -44,7 +48,7 @@ public class PautaUseCaseImpl implements PautaUseCase {
     @Override
     public PautaDto createPauta(PautaRequest pautaRequest) {
         var pauta = PautaMapper.INSTANCE.toPauta(pautaRequest);
-        pauta.setStatus(StatusPautaEnum.ANALISE);
+        pauta.setStatus(EnumStatusPauta.ANALISE);
         return PautaMapper.INSTANCE.toPautaDto(pautaGateway.createOrUpdatePauta(pauta));
     }
 
@@ -52,7 +56,7 @@ public class PautaUseCaseImpl implements PautaUseCase {
     public PautaDto updatePauta(Long id, PautaRequest pautaRequest) {
         var pauta = pautaGateway.getPautaById(id).orElse(null);
         if (isNull(pauta)) {
-            throw new EntityNotFoundException("Pauta não encontrada para o Id: " + id);
+            throw new EntityNotFoundException(messageSourceService.getMessage(ENTITY_NOT_FOUND_PAUTA, id));
         }
         PautaMapper.INSTANCE.updatePautaFromPautaRequest(pautaRequest, pauta);
         return PautaMapper.INSTANCE.toPautaDto(pautaGateway.createOrUpdatePauta(pauta));
@@ -69,7 +73,7 @@ public class PautaUseCaseImpl implements PautaUseCase {
         var sessao = sessaoGateway.getSessaoByPautaId(id).orElse(null);
 
         if (nonNull(sessao)) {
-            throw new BusinessException("Não é possivel deletar a pauta de id: " + id + " por que está vinculada a sessão de id: " + sessao.getId());
+            throw new BusinessException(messageSourceService.getMessage(BUSINESS_PAUTA_VINCULADA_SESSAO_ABERTA, id, sessao.getId()));
         }
         pautaGateway.deletePauta(id);
     }
@@ -78,7 +82,7 @@ public class PautaUseCaseImpl implements PautaUseCase {
     public TotalVotosDto getTotalVotos(Long pautaId) {
         var pautaOptional = pautaGateway.getPautaById(pautaId);
         if (pautaOptional.isEmpty()) {
-            throw new BusinessException("Não existe uma pauta para esse id: " + pautaId);
+            throw new EntityNotFoundException(messageSourceService.getMessage(ENTITY_NOT_FOUND_PAUTA, pautaId));
         }
         return pautaGateway.getTotalVotos(pautaId);
     }

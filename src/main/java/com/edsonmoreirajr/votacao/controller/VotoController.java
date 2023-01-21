@@ -2,36 +2,39 @@ package com.edsonmoreirajr.votacao.controller;
 
 import com.edsonmoreirajr.votacao.dto.VotoDto;
 import com.edsonmoreirajr.votacao.dto.request.VotoRequest;
-import com.edsonmoreirajr.votacao.usecase.VotoUseCase;
-import com.edsonmoreirajr.votacao.util.HateoasUtil;
+import com.edsonmoreirajr.votacao.dto.response.ErrorMessage;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 
-@RestController
-@RequestMapping("/api/v1/votos")
 @Tag(name = "Votos", description = "Votos endpoints")
-@RequiredArgsConstructor
-public class VotoController {
+public interface VotoController {
 
-    private final VotoUseCase votoUseCase;
-    private final HateoasUtil<?> hateoasUtil;
-
-    @PostMapping(value = "/votar")
-    @Operation(description = "Cria um voto.")
-    public ResponseEntity<VotoDto> createVoto(
-            @Parameter(description = "Objeto com dados do voto para criação.") @RequestBody VotoRequest votoRequest) {
-
-        var votoDto = votoUseCase.createVoto(votoRequest);
-
-        return ResponseEntity
-                .created(hateoasUtil.getHateoasSelLik(VotoController.class, votoDto.getId()))
-                .body(votoDto);
-    }
+    @Operation(summary = "Cria um voto",
+            description = "Cria um voto com dados enviados pelo body da requisição.",
+            responses = {
+                    @ApiResponse(
+                            responseCode = "201",
+                            description = "Voto criado com sucesso.",
+                            content = @Content(schema = @Schema(implementation = VotoDto.class))),
+                    @ApiResponse(
+                            responseCode = "400",
+                            description = "Um ou mais dados do voto enviados na requisição estão incorretos.",
+                            content = @Content(schema = @Schema(implementation = ErrorMessage.class))),
+                    @ApiResponse(
+                            responseCode = "422",
+                            description = "Não foi possível processar a sua solicitação devido a um erro de negócio.",
+                            content = @Content(schema = @Schema(implementation = ErrorMessage.class))),
+                    @ApiResponse(
+                            responseCode = "404",
+                            description = "Associado não econtrado para o id informado.",
+                            content = @Content(schema = @Schema(implementation = ErrorMessage.class)))
+            }
+    )
+    ResponseEntity<VotoDto> createVoto(
+            @Parameter(description = "Objeto com dados do voto para criação.") VotoRequest votoRequest);
 }

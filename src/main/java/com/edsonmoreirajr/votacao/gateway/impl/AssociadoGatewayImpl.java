@@ -1,9 +1,11 @@
 package com.edsonmoreirajr.votacao.gateway.impl;
 
+import com.edsonmoreirajr.votacao.config.message.MessageSourceService;
 import com.edsonmoreirajr.votacao.entity.Associado;
-import com.edsonmoreirajr.votacao.entity.enums.StatusAssociadoEnum;
+import com.edsonmoreirajr.votacao.entity.enums.EnumStatusAssociado;
 import com.edsonmoreirajr.votacao.gateway.AssociadoGateway;
 import com.edsonmoreirajr.votacao.repository.AssociadoRepository;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -17,6 +19,8 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class AssociadoGatewayImpl implements AssociadoGateway {
 
+    private final static String ENTITY_NOT_FOUND_ASSOCIADO = "entity-not-found.associado";
+    private final MessageSourceService messageSourceService;
     private final AssociadoRepository associadoRepository;
 
     @Override
@@ -36,11 +40,15 @@ public class AssociadoGatewayImpl implements AssociadoGateway {
 
     @Override
     public void deleteAssociado(Long id) {
+        var associado = associadoRepository.findById(id);
+        if (associado.isEmpty()) {
+            throw new EntityNotFoundException(messageSourceService.getMessage(ENTITY_NOT_FOUND_ASSOCIADO, id));
+        }
         associadoRepository.deleteById(id);
     }
 
     @Override
-    public StatusAssociadoEnum getStatusByAssociadoId(Long id) {
+    public EnumStatusAssociado getStatusByAssociadoId(Long id) {
         return associadoRepository.findStatusByAssociadoId(id);
     }
 

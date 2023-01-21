@@ -1,7 +1,7 @@
 package com.edsonmoreirajr.votacao.gateway;
 
 import com.edsonmoreirajr.votacao.entity.Associado;
-import com.edsonmoreirajr.votacao.entity.enums.StatusAssociadoEnum;
+import com.edsonmoreirajr.votacao.entity.enums.EnumStatusAssociado;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -17,7 +17,7 @@ public interface AssociadoGateway {
 
     void deleteAssociado(Long id);
 
-    StatusAssociadoEnum getStatusByAssociadoId(Long id);
+    EnumStatusAssociado getStatusByAssociadoId(Long id);
 
     Optional<Associado> getAssociadoByCPF(String cpf);
 

@@ -3,107 +3,112 @@ package com.edsonmoreirajr.votacao.controller;
 import com.edsonmoreirajr.votacao.dto.PautaDto;
 import com.edsonmoreirajr.votacao.dto.TotalVotosDto;
 import com.edsonmoreirajr.votacao.dto.request.PautaRequest;
+import com.edsonmoreirajr.votacao.dto.response.ErrorMessage;
 import com.edsonmoreirajr.votacao.dto.response.PagedResponse;
-import com.edsonmoreirajr.votacao.usecase.PautaUseCase;
-import com.edsonmoreirajr.votacao.util.HateoasUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
-import org.springdoc.api.annotations.ParameterObject;
-import org.springframework.data.domain.Page;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.web.SortDefault;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 
-import static java.util.Objects.nonNull;
-
-@RestController
-@RequestMapping("/api/v1/pautas")
 @Tag(name = "Pautas", description = "Pautas endpoints")
-@RequiredArgsConstructor
-public class PautaController {
+public interface PautaController {
 
-    private final PautaUseCase pautaUseCase;
-    private final HateoasUtil<PautaDto> hateoasUtil;
+    @Operation(summary = "Busca todas as pautas.",
+            description = "Retorna uma lista paginada de todas as pautas cadastradas.",
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Operação bem sucedida",
+                            content = @Content(schema = @Schema(implementation = PagedResponse.class)))
+            }
+    )
+    ResponseEntity<PagedResponse<PautaDto>> getAllPautas(@ParameterObject Pageable pageable);
 
-    @GetMapping
-    @Operation(description = "Retorna uma lista paginada de todas as pautas cadastradas.")
-    public ResponseEntity<PagedResponse<PautaDto>> getAllPautas(
-            @SortDefault.SortDefaults({
-                    @SortDefault(sort = "titulo", direction = Sort.Direction.ASC),
-                    @SortDefault(sort = "status", direction = Sort.Direction.ASC)
+    @Operation(summary = "Cria uma pauta.",
+            description = "Cria um pauta com dados enviados pelo body da requisição.",
+            responses = {
+                    @ApiResponse(
+                            responseCode = "201",
+                            description = "Pauta criada com sucesso.",
+                            content = @Content(schema = @Schema(implementation = PautaDto.class))),
+                    @ApiResponse(
+                            responseCode = "400",
+                            description = "Um ou mais dados da pauta enviados na requisição estão incorretos.",
+                            content = @Content(schema = @Schema(implementation = ErrorMessage.class)))
             })
-            @ParameterObject Pageable pageable) {
+    ResponseEntity<PautaDto> createPauta(
+            @Parameter(description = "Objeto com dados da pauta para criação.") PautaRequest pautaRequest);
 
-        Page<PautaDto> pautaDtos = pautaUseCase.getAllPautas(pageable);
-        return ResponseEntity.ok(hateoasUtil.buildResponseList(pautaDtos));
-    }
-
-    @PostMapping("/create")
-    @Operation(description = "Cria uma pauta.")
-    public ResponseEntity<PautaDto> createPauta(
-            @Parameter(description = "Objeto com dados da pauta para criação.") @Valid @RequestBody PautaRequest pautaRequest) {
-
-        PautaDto pautaDto = pautaUseCase.createPauta(pautaRequest);
-        return ResponseEntity
-                .created(hateoasUtil.getHateoasSelLik(PautaController.class, pautaDto.getId()))
-                .body(pautaDto);
-    }
-
-    @PutMapping(value = "/{id}")
-    @Operation(description = "Atualiza os dados de uma pauta por id.")
+    @Operation(summary = "Atualiza os dados de uma pauta.",
+            description = "Atualiza os dados de uma pauta por id.",
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Operação bem sucedida.",
+                            content = @Content(schema = @Schema(implementation = PautaDto.class))),
+                    @ApiResponse(
+                            responseCode = "400",
+                            description = "Um ou mais dados da pauta enviados na requisição estão incorretos.",
+                            content = @Content(schema = @Schema(implementation = ErrorMessage.class))),
+                    @ApiResponse(
+                            responseCode = "404",
+                            description = "Pauta não econtrada para o id informado.",
+                            content = @Content(schema = @Schema(implementation = ErrorMessage.class)))})
     ResponseEntity<PautaDto> updatePauta(
-            @Parameter(description = "Id da pauta.") @PathVariable("id") Long id,
-            @Parameter(description = "Objeto com dados da pauta para atualização.") @Valid @RequestBody PautaRequest pautaRequest) {
+            @Parameter(description = "Id da pauta.") Long id,
+            @Parameter(description = "Objeto com dados da pauta para atualização.") PautaRequest pautaRequest);
 
-        PautaDto pautaDto = pautaUseCase.updatePauta(id, pautaRequest);
-        return ResponseEntity.ok(pautaDto);
-    }
+    @Operation(summary = "Busca pauta.",
+            description = "Busca uma pauta pelo id.",
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Operação bem sucedida.",
+                            content = @Content(schema = @Schema(implementation = PautaDto.class))),
+                    @ApiResponse(
+                            responseCode = "400",
+                            description = "O id do pauta precisa ser maior que zero.",
+                            content = @Content(schema = @Schema(implementation = ErrorMessage.class))),
+                    @ApiResponse(
+                            responseCode = "204",
+                            description = "Pauta não econtrada para o id informado.",
+                            content = @Content(schema = @Schema(implementation = ErrorMessage.class)))})
+    ResponseEntity<PautaDto> getPautaById(@Parameter(description = "Id da pauta.") Long id);
 
-    @GetMapping(value = "/{id}")
-    @Operation(description = "Busca uma pauta pelo id.")
-    public ResponseEntity<PautaDto> getPautaById(
-            @Parameter(description = "Id da pauta.") @PathVariable("id") Long id) {
+    @Operation(summary = "Deleta uma pauta.",
+            description = "Deleta uma pauta pelo id.",
+            responses = {
+                    @ApiResponse(
+                            responseCode = "400",
+                            description = "O id da pauta precisa ser maior que zero.",
+                            content = @Content(schema = @Schema(implementation = ErrorMessage.class))),
+                    @ApiResponse(
+                            responseCode = "204",
+                            description = "Pauta foi deletada com sucesso.")
+            })
+    ResponseEntity<Void> deletePauta(@Parameter(description = "Id da pauta.") Long id);
 
-        PautaDto pautaDto = pautaUseCase.getPautaById(id);
-
-        if (nonNull(pautaDto)) {
-            return ResponseEntity.ok(pautaDto);
-        }
-        return ResponseEntity.noContent().build();
-    }
-
-    @DeleteMapping(value = "/{id}")
-    @Operation(description = "Deleta uma pauta pelo id.")
-    public ResponseEntity<Void> deletePauta(
-            @Parameter(description = "Id da pauta.") @PathVariable("id") Long id) {
-
-        pautaUseCase.deletePauta(id);
-        return ResponseEntity.noContent().build();
-    }
-
-    @GetMapping(value = "/{pautaId}/total-votos")
-    @Operation(description = "Processa o total de votos e retorna esses valores e o dados da pauta pelo id dela.")
-    public ResponseEntity<TotalVotosDto> getTotalVotos(
-            @Parameter(description = "Id da pauta") @PathVariable("pautaId") Long pautaId) {
-
-        TotalVotosDto totalVotosResponseModel = pautaUseCase.getTotalVotos(pautaId);
-
-        if (nonNull(totalVotosResponseModel)) {
-            return ResponseEntity.ok(totalVotosResponseModel);
-        }
-        return ResponseEntity.noContent().build();
-    }
-
+    @Operation(summary = "Retornar o total de votos.",
+            description = "Processa o total de votos e retorna esses valores e o dados da pauta pelo id dela.",
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Operação bem sucedida",
+                            content = @Content(schema = @Schema(implementation = TotalVotosDto.class))),
+                    @ApiResponse(
+                            responseCode = "400",
+                            description = "O id do pauta precisa ser maior que zero.",
+                            content = @Content(schema = @Schema(implementation = ErrorMessage.class))),
+                    @ApiResponse(
+                            responseCode = "204",
+                            description = "Pauta não econtrada para o id informado.")
+            }
+    )
+    ResponseEntity<TotalVotosDto> getTotalVotos(
+            @Parameter(description = "Id da pauta") Long pautaId);
 }

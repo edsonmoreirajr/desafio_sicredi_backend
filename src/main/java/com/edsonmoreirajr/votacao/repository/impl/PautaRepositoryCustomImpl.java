@@ -1,5 +1,6 @@
 package com.edsonmoreirajr.votacao.repository.impl;
 
+import com.edsonmoreirajr.votacao.config.message.MessageSourceService;
 import com.edsonmoreirajr.votacao.dto.TotalVotosDto;
 import com.edsonmoreirajr.votacao.exception.BusinessException;
 import com.edsonmoreirajr.votacao.mapper.VotoMapper;
@@ -14,7 +15,8 @@ import org.springframework.stereotype.Component;
 @Component
 @AllArgsConstructor
 public class PautaRepositoryCustomImpl implements PautaRepositoryCustom {
-
+    private final static String BUSINESS_PAUTA_DADOS_NAO_ENCONTRADOS = "business.pauta.dados-nao-encontrados";
+    private final MessageSourceService messageSourceService;
     private EntityManager entityManager;
 
     @Override
@@ -45,7 +47,7 @@ public class PautaRepositoryCustomImpl implements PautaRepositoryCustom {
         try {
             totalVotosTuple = (Tuple) jpaQuery.getSingleResult();
         } catch (NoResultException e) {
-            throw new BusinessException("Não existe dados para pauta de id: " + pautaId);
+            throw new BusinessException(messageSourceService.getMessage(BUSINESS_PAUTA_DADOS_NAO_ENCONTRADOS, pautaId));
         }
 
         return VotoMapper.INSTANCE.tupleToTotalVotosDto(totalVotosTuple);

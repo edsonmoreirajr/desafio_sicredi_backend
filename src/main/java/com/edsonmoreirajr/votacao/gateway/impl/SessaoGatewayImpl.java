@@ -1,8 +1,10 @@
 package com.edsonmoreirajr.votacao.gateway.impl;
 
+import com.edsonmoreirajr.votacao.config.message.MessageSourceService;
 import com.edsonmoreirajr.votacao.entity.Sessao;
 import com.edsonmoreirajr.votacao.gateway.SessaoGateway;
 import com.edsonmoreirajr.votacao.repository.SessaoRepository;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -15,6 +17,8 @@ import java.util.Optional;
 @Component
 @RequiredArgsConstructor
 public class SessaoGatewayImpl implements SessaoGateway {
+    private final static String ENTITY_NOT_FOUND_SESSAO = "entity-not-found.sessao";
+    private final MessageSourceService messageSourceService;
 
     private final SessaoRepository sessaoRepository;
 
@@ -35,6 +39,10 @@ public class SessaoGatewayImpl implements SessaoGateway {
 
     @Override
     public void deleteSessao(Long id) {
+        var pauta = sessaoRepository.findById(id);
+        if (pauta.isEmpty()) {
+            throw new EntityNotFoundException(messageSourceService.getMessage(ENTITY_NOT_FOUND_SESSAO, id));
+        }
         sessaoRepository.deleteById(id);
     }
 

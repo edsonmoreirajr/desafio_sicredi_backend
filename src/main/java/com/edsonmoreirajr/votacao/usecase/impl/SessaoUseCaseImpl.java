@@ -1,10 +1,11 @@
 package com.edsonmoreirajr.votacao.usecase.impl;
 
+import com.edsonmoreirajr.votacao.config.message.MessageSourceService;
 import com.edsonmoreirajr.votacao.dto.SessaoDto;
 import com.edsonmoreirajr.votacao.dto.TotalVotosDto;
 import com.edsonmoreirajr.votacao.dto.request.SessaoRequest;
 import com.edsonmoreirajr.votacao.entity.Sessao;
-import com.edsonmoreirajr.votacao.entity.enums.StatusPautaEnum;
+import com.edsonmoreirajr.votacao.entity.enums.EnumStatusPauta;
 import com.edsonmoreirajr.votacao.exception.BusinessException;
 import com.edsonmoreirajr.votacao.gateway.PautaGateway;
 import com.edsonmoreirajr.votacao.gateway.SessaoGateway;
@@ -36,6 +37,14 @@ import static java.util.Objects.nonNull;
 @Service
 @RequiredArgsConstructor
 public class SessaoUseCaseImpl implements SessaoUseCase {
+
+    private final static String BUSINESS_SESSAO_JA_ABERTA_PARA_PAUTA = "business.sessao.ja-aberta-para-pauta";
+    private final static String ENTITY_NOT_FOUND_SESSAO = "entity-not-found.sessao";
+    private final static String ENTITY_NOT_FOUND_PAUTA = "entity-not-found.pauta";
+    private final static String BUSINESS_SESSAO_NAO_ESTA_ATIVA = "business.sessao.nao-esta-ativa";
+    private final static String BUSINESS_SESSAO_NAO_HA_MAIS_TEMPO_PARA_VOTAR = "business.sessao.nao-ha-mais-tempo-para-votar";
+
+    private final MessageSourceService messageSourceService;
     private final TaskScheduler taskScheduler;
     private final SessaoGateway sessaoGateway;
     private final PautaGateway pautaGateway;
@@ -55,7 +64,7 @@ public class SessaoUseCaseImpl implements SessaoUseCase {
     public SessaoDto updateSessao(Long id, SessaoRequest sessaoRequest) {
         var sessao = sessaoGateway.getSessaoById(id).orElse(null);
         if (isNull(sessao)) {
-            throw new EntityNotFoundException("Sessão não encontrado para o Id: " + id);
+            throw new EntityNotFoundException(messageSourceService.getMessage(ENTITY_NOT_FOUND_SESSAO, id));
         }
         SessaoMapper.INSTANCE.updateSessaoFromSessaoRequest(sessaoRequest, sessao);
         return SessaoMapper.INSTANCE.toSessaoDto(sessaoGateway.createOrUpdateSessao(sessao));
@@ -78,7 +87,7 @@ public class SessaoUseCaseImpl implements SessaoUseCase {
     public SessaoDto abrirSessao(SessaoRequest sessaoRequest) {
         var sessao = sessaoGateway.getSessaoByPautaId(sessaoRequest.getPautaId()).orElse(null);
         if (nonNull(sessao)) {
-            throw new BusinessException("Não é possivel abrir uma nova sessão por que já existe outra aberta para pauta de id: " + sessaoRequest.getPautaId());
+            throw new BusinessException(messageSourceService.getMessage(BUSINESS_SESSAO_JA_ABERTA_PARA_PAUTA, sessaoRequest.getPautaId()));
         }
 
         sessao = SessaoMapper.INSTANCE.toSessao(sessaoRequest);
@@ -115,19 +124,19 @@ public class SessaoUseCaseImpl implements SessaoUseCase {
     private void validaPautaEAtualizaStatusPauta(Sessao sessao) {
         var pauta = pautaGateway.getPautaById(sessao.getPauta().getId()).orElse(null);
         if (isNull(pauta)) {
-            throw new EntityNotFoundException("Pauta não encontrada para o id: " + sessao.getPauta().getId());
+            throw new EntityNotFoundException(messageSourceService.getMessage(ENTITY_NOT_FOUND_PAUTA, sessao.getPauta().getId()));
         }
 
         TotalVotosDto totalVotosDto = pautaGateway.getTotalVotos(pauta.getId());
 
         if (totalVotosDto.getTotalVotosSim() > totalVotosDto.getTotalVotosNao()) {
-            pauta.setStatus(StatusPautaEnum.APROVADA);
+            pauta.setStatus(EnumStatusPauta.APROVADA);
 
         } else if (totalVotosDto.getTotalVotosSim() < totalVotosDto.getTotalVotosNao()) {
-            pauta.setStatus(StatusPautaEnum.RECUSADA);
+            pauta.setStatus(EnumStatusPauta.RECUSADA);
 
         } else {
-            pauta.setStatus(StatusPautaEnum.EMPATE);
+            pauta.setStatus(EnumStatusPauta.EMPATE);
         }
         pautaGateway.createOrUpdatePauta(pauta);
     }
@@ -135,19 +144,18 @@ public class SessaoUseCaseImpl implements SessaoUseCase {
     @Override
     public void validaSessaoEstaAtiva(Sessao sessao, Long id) {
         if (isNull(sessao)) {
-            throw new EntityNotFoundException("Sessão não encontrada para o id: " + id);
+            throw new EntityNotFoundException(messageSourceService.getMessage(ENTITY_NOT_FOUND_SESSAO, id));
         }
         if (!sessao.getAtivo()) {
-            throw new BusinessException("A sessão de id: " + id + " não está está ativa e não é mais possivel votar.");
+            throw new BusinessException(messageSourceService.getMessage(BUSINESS_SESSAO_NAO_ESTA_ATIVA, id));
         }
     }
-
     @Override
     public void verificaSeHaTempoRestanteParaVotar(Sessao sessao) {
         var dateTimeFechamento = sessao.getAbertura().plus(sessao.getDuracao(), ChronoUnit.MINUTES);
         long tempoRestanteSegundos = ChronoUnit.SECONDS.between(sessao.getAbertura(), dateTimeFechamento);
         if (tempoRestanteSegundos <= 10) {
-            throw new BusinessException("Não há mais tempo habil para votar na sessão de id: " + sessao.getId());
+            throw new BusinessException(messageSourceService.getMessage(BUSINESS_SESSAO_NAO_HA_MAIS_TEMPO_PARA_VOTAR, sessao.getId()));
         }
     }
 }

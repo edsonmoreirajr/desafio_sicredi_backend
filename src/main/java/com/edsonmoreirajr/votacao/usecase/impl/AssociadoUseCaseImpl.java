@@ -1,5 +1,6 @@
 package com.edsonmoreirajr.votacao.usecase.impl;
 
+import com.edsonmoreirajr.votacao.config.message.MessageSourceService;
 import com.edsonmoreirajr.votacao.dto.AssociadoDto;
 import com.edsonmoreirajr.votacao.dto.request.AssociadoRequest;
 import com.edsonmoreirajr.votacao.exception.BusinessException;
@@ -25,6 +26,9 @@ import static java.util.Objects.nonNull;
 @RequiredArgsConstructor
 public class AssociadoUseCaseImpl implements AssociadoUseCase {
 
+    private final static String BUSINESS_ASSOCIADO_CADASTRADO_CPF = "business.associado.ja-cadastrado-com-cpf";
+    private final static String ENTITY_NOT_FOUND_ASSOCIADO = "entity-not-found.associado";
+    private final MessageSourceService messageSourceService;
     private final AssociadoGateway associadoGateway;
 
     @Override
@@ -41,7 +45,7 @@ public class AssociadoUseCaseImpl implements AssociadoUseCase {
     public AssociadoDto createAssociado(AssociadoRequest associadoRequest) {
         var associado = associadoGateway.getAssociadoByCPF(associadoRequest.getCpf()).orElse(null);
         if (nonNull(associado)) {
-            throw new BusinessException("Usuário já cadastrado com CPF: " + associadoRequest.getCpf());
+            throw new BusinessException(messageSourceService.getMessage(BUSINESS_ASSOCIADO_CADASTRADO_CPF, associadoRequest.getCpf()));
         }
         associado = AssociadoMapper.INSTANCE.toAssociado(associadoRequest);
         return AssociadoMapper.INSTANCE.toAssociadoDto(associadoGateway.createOrUpdateAssociado(associado));
@@ -51,7 +55,7 @@ public class AssociadoUseCaseImpl implements AssociadoUseCase {
     public AssociadoDto updateAssociado(Long id, AssociadoRequest associadoRequest) {
         var associado = associadoGateway.getAssociadoById(id).orElse(null);
         if (isNull(associado)) {
-            throw new EntityNotFoundException("Associado não encontrado para o Id: " + id);
+            throw new EntityNotFoundException(messageSourceService.getMessage(ENTITY_NOT_FOUND_ASSOCIADO, id));
         }
         AssociadoMapper.INSTANCE.updateAssociadoFromAssociadoRequest(associadoRequest, associado);
         return AssociadoMapper.INSTANCE.toAssociadoDto(associadoGateway.createOrUpdateAssociado(associado));

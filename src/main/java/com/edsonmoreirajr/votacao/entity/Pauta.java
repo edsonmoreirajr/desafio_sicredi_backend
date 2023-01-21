@@ -1,6 +1,6 @@
 package com.edsonmoreirajr.votacao.entity;
 
-import com.edsonmoreirajr.votacao.entity.enums.StatusPautaEnum;
+import com.edsonmoreirajr.votacao.entity.enums.EnumStatusPauta;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -42,6 +42,6 @@ public class Pauta {
 
     @Column(name = "status", length = 8)
     @Enumerated(EnumType.STRING)
-    private StatusPautaEnum status;
+    private EnumStatusPauta status;
 
 }

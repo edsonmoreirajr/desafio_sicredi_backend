@@ -1,5 +1,6 @@
 package com.edsonmoreirajr.votacao.dto.response;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -9,8 +10,10 @@ import java.util.List;
 @Getter
 @RequiredArgsConstructor
 public class PagedResponse<T> implements Serializable {
-
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED, description = "Lista com dados buscados do banco de dados.")
     private final List<T> data;
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED, description = "Objeto com informações de total de registros e total de páginas.")
     private final Meta meta;
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED, description = "Objeto com links que represetam a páginação")
     private final Links links;
 }

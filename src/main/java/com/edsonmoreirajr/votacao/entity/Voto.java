@@ -1,6 +1,6 @@
 package com.edsonmoreirajr.votacao.entity;
 
-import com.edsonmoreirajr.votacao.entity.enums.VotoEnum;
+import com.edsonmoreirajr.votacao.entity.enums.EnumVoto;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -35,7 +35,7 @@ public class Voto {
     @NotNull
     @Column(name = "voto", nullable = false, length = 3)
     @Enumerated(EnumType.STRING)
-    private VotoEnum voto;
+    private EnumVoto voto;
 
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY, optional = false)

@@ -1,6 +1,6 @@
 package com.edsonmoreirajr.votacao.dto.response;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -16,18 +16,14 @@ import java.io.Serializable;
 @AllArgsConstructor
 public class Links implements Serializable {
 
-    @JsonProperty("self")
+    @Schema(requiredMode = Schema.RequiredMode.NOT_REQUIRED, description = "Link que representa a página atual exibida.")
     private String self;
-
-    @JsonProperty("first")
+    @Schema(requiredMode = Schema.RequiredMode.NOT_REQUIRED, description = "Link que representa a primeira.")
     private String first;
-
-    @JsonProperty("prev")
+    @Schema(requiredMode = Schema.RequiredMode.NOT_REQUIRED, description = "Link que representa a página anterior.")
     private String prev;
-
-    @JsonProperty("next")
+    @Schema(requiredMode = Schema.RequiredMode.NOT_REQUIRED, description = "Link que representa a próxima página.")
     private String next;
-
-    @JsonProperty("last")
+    @Schema(requiredMode = Schema.RequiredMode.NOT_REQUIRED, description = "Link que representa a última página.")
     private String last;
 }

@@ -1,6 +1,6 @@
 package com.edsonmoreirajr.votacao.entity.enums;
 
-public enum StatusPautaEnum {
+public enum EnumStatusPauta {
     APROVADA,
     RECUSADA,
     EMPATE,

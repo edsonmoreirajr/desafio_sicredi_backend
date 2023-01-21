@@ -16,4 +16,3 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         ddl-auto: none
-

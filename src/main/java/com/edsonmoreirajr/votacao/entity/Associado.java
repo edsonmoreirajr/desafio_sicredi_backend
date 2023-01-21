@@ -1,6 +1,6 @@
 package com.edsonmoreirajr.votacao.entity;
 
-import com.edsonmoreirajr.votacao.entity.enums.StatusAssociadoEnum;
+import com.edsonmoreirajr.votacao.entity.enums.EnumStatusAssociado;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -43,6 +43,6 @@ public class Associado {
     @NotNull
     @Column(name = "status", length = 14)
     @Enumerated(EnumType.STRING)
-    private StatusAssociadoEnum status;
+    private EnumStatusAssociado status;
 
 }
