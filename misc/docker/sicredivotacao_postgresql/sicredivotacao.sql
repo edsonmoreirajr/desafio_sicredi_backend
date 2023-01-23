@@ -25,7 +25,7 @@ CREATE TABLE associado
 (
     "id" BIGSERIAL,
     "nome" VARCHAR(200) NOT NULL,
-    "cpf" VARCHAR(11) NOT NULL UNIQUE,
+    "cpf" VARCHAR(11) NOT NULL,
     "status" VARCHAR(14) NOT NULL,
     CONSTRAINT "PK_Associado" PRIMARY KEY  ("id")
 );

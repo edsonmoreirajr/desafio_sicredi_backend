@@ -6,7 +6,7 @@ import com.edsonmoreirajr.votacao.dto.TotalVotosDto;
 import com.edsonmoreirajr.votacao.dto.request.SessaoRequest;
 import com.edsonmoreirajr.votacao.entity.Sessao;
 import com.edsonmoreirajr.votacao.entity.enums.EnumStatusPauta;
-import com.edsonmoreirajr.votacao.exception.BusinessException;
+import com.edsonmoreirajr.votacao.exception.entities.BusinessException;
 import com.edsonmoreirajr.votacao.gateway.PautaGateway;
 import com.edsonmoreirajr.votacao.gateway.SessaoGateway;
 import com.edsonmoreirajr.votacao.gateway.VotoGateway;
@@ -16,7 +16,6 @@ import com.edsonmoreirajr.votacao.usecase.SessaoUseCase;
 import com.edsonmoreirajr.votacao.validator.PageableValidator;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -33,7 +32,6 @@ import java.util.stream.Collectors;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
 public class SessaoUseCaseImpl implements SessaoUseCase {

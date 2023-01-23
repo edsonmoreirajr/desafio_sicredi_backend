@@ -6,14 +6,12 @@ import com.edsonmoreirajr.votacao.gateway.SessaoGateway;
 import com.edsonmoreirajr.votacao.repository.SessaoRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;
 
-@Slf4j
 @Component
 @RequiredArgsConstructor
 public class SessaoGatewayImpl implements SessaoGateway {

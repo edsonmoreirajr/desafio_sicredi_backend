@@ -2,6 +2,8 @@ package com.edsonmoreirajr.votacao.exception;
 
 import com.edsonmoreirajr.votacao.dto.response.ErrorMessage;
 import com.edsonmoreirajr.votacao.dto.response.ErrorMessages;
+import com.edsonmoreirajr.votacao.exception.entities.BusinessException;
+import com.edsonmoreirajr.votacao.exception.entities.InvalidArgumentRequestException;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;

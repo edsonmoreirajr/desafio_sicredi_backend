@@ -1,4 +1,4 @@
-package com.edsonmoreirajr.votacao.exception;
+package com.edsonmoreirajr.votacao.exception.entities;
 
 public class BusinessException extends RuntimeException {
 

@@ -5,7 +5,7 @@ import com.edsonmoreirajr.votacao.dto.VotoDto;
 import com.edsonmoreirajr.votacao.dto.request.VotoRequest;
 import com.edsonmoreirajr.votacao.entity.Sessao;
 import com.edsonmoreirajr.votacao.entity.enums.EnumStatusAssociado;
-import com.edsonmoreirajr.votacao.exception.BusinessException;
+import com.edsonmoreirajr.votacao.exception.entities.BusinessException;
 import com.edsonmoreirajr.votacao.gateway.AssociadoGateway;
 import com.edsonmoreirajr.votacao.gateway.SessaoGateway;
 import com.edsonmoreirajr.votacao.gateway.VotoGateway;
@@ -14,13 +14,11 @@ import com.edsonmoreirajr.votacao.usecase.SessaoUseCase;
 import com.edsonmoreirajr.votacao.usecase.VotoUseCase;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
 public class VotoUseCaseImpl implements VotoUseCase {

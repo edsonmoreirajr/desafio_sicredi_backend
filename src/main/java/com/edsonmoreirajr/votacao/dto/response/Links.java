@@ -5,15 +5,13 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import java.io.Serializable;
 
 @Builder
 @Getter
-@Setter
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 public class Links implements Serializable {
 
     @Schema(requiredMode = Schema.RequiredMode.NOT_REQUIRED, description = "Link que representa a página atual exibida.")

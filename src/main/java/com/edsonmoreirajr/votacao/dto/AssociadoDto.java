@@ -1,5 +1,6 @@
 package com.edsonmoreirajr.votacao.dto;
 
+import com.edsonmoreirajr.votacao.entity.enums.EnumStatusAssociado;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -16,5 +17,5 @@ public class AssociadoDto {
     private Long id;
     private String nome;
     private String cpf;
-    private String status;
+    private EnumStatusAssociado status;
 }

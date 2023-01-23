@@ -1,5 +1,6 @@
 package com.edsonmoreirajr.votacao.dto;
 
+import com.edsonmoreirajr.votacao.entity.enums.EnumStatusPauta;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -16,5 +17,5 @@ public class PautaDto {
     private Long id;
     private String titulo;
     private String descricao;
-    private String status;
+    private EnumStatusPauta status;
 }

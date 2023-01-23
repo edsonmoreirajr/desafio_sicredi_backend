@@ -3,14 +3,13 @@ package com.edsonmoreirajr.votacao.usecase.impl;
 import com.edsonmoreirajr.votacao.config.message.MessageSourceService;
 import com.edsonmoreirajr.votacao.dto.AssociadoDto;
 import com.edsonmoreirajr.votacao.dto.request.AssociadoRequest;
-import com.edsonmoreirajr.votacao.exception.BusinessException;
+import com.edsonmoreirajr.votacao.exception.entities.BusinessException;
 import com.edsonmoreirajr.votacao.gateway.AssociadoGateway;
 import com.edsonmoreirajr.votacao.mapper.AssociadoMapper;
 import com.edsonmoreirajr.votacao.usecase.AssociadoUseCase;
 import com.edsonmoreirajr.votacao.validator.PageableValidator;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -21,7 +20,6 @@ import java.util.stream.Collectors;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AssociadoUseCaseImpl implements AssociadoUseCase {

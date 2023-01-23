@@ -2,7 +2,7 @@ package com.edsonmoreirajr.votacao.repository.impl;
 
 import com.edsonmoreirajr.votacao.config.message.MessageSourceService;
 import com.edsonmoreirajr.votacao.dto.TotalVotosDto;
-import com.edsonmoreirajr.votacao.exception.BusinessException;
+import com.edsonmoreirajr.votacao.exception.entities.BusinessException;
 import com.edsonmoreirajr.votacao.mapper.VotoMapper;
 import com.edsonmoreirajr.votacao.repository.PautaRepositoryCustom;
 import jakarta.persistence.EntityManager;
@@ -17,7 +17,7 @@ import org.springframework.stereotype.Component;
 public class PautaRepositoryCustomImpl implements PautaRepositoryCustom {
     private final static String BUSINESS_PAUTA_DADOS_NAO_ENCONTRADOS = "business.pauta.dados-nao-encontrados";
     private final MessageSourceService messageSourceService;
-    private EntityManager entityManager;
+    private final EntityManager entityManager;
 
     @Override
     public TotalVotosDto getTotalVotos(Long pautaId) {
